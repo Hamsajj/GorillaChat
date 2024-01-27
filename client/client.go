@@ -3,6 +3,7 @@ package client
 import (
 	"context"
 	"fmt"
+	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
 	"log"
 	"net/url"
@@ -10,6 +11,7 @@ import (
 )
 
 type Client struct {
+	ID         string
 	ctx        context.Context
 	serverURL  url.URL
 	connection *websocket.Conn
@@ -17,7 +19,8 @@ type Client struct {
 }
 
 func New(ctx context.Context, serverURL url.URL) (*Client, func() error) {
-	c := &Client{ctx, serverURL, nil, make(chan struct{})}
+	id := uuid.NewString()
+	c := &Client{id, ctx, serverURL, nil, make(chan struct{})}
 	return c, c.cleanup
 }
 
