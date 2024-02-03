@@ -1,16 +1,22 @@
 package server
 
+import "net/http"
+
 type ErrorResponse struct {
 	Message string `json:"error"`
 	Code    int    `json:"code"`
 }
 
-var ClientIDRequiredError = ErrorResponse{
-	Message: "clientID is required",
-	Code:    400,
+func NewClientIDRequiredError() ErrorResponse {
+	return ErrorResponse{
+		Message: "clientID is required",
+		Code:    http.StatusBadRequest,
+	}
 }
 
-var UnsupportedMessageType = ErrorResponse{
-	Message: "message type is not supported",
-	Code:    400,
+func NewUnsupportedMessageType() ErrorResponse {
+	return ErrorResponse{
+		Message: "message type is not supported",
+		Code:    http.StatusBadRequest,
+	}
 }

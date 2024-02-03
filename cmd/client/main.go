@@ -2,11 +2,12 @@ package main
 
 import (
 	"context"
-	"github.com/hamsajj/gorillachat/client"
 	"log"
 	"net/url"
 	"os"
 	"os/signal"
+
+	"github.com/hamsajj/gorillachat/client"
 )
 
 func main() {
