@@ -87,6 +87,7 @@ func createNewConnection(t *testing.T, httpServer *httptest.Server, clientID str
 func assertReadMessage(t *testing.T, conn *websocket.Conn, expectedMessage broadcastMessage) {
 	assert.NoError(t, conn.SetReadDeadline(time.Now().Add(time.Second*2)))
 	_, msg1, err := conn.ReadMessage()
+	assert.NoError(t, err)
 	message, err := toBroadcastMessage(msg1)
 	assert.NoError(t, err)
 	assert.Equal(t, expectedMessage, message)
