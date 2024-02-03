@@ -6,6 +6,6 @@ import (
 )
 
 func main() {
-	s := server.New(8080)
-	log.Fatal(s.Start())
+	s := server.New()
+	log.Fatal(s.Start(8080))
 }

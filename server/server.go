@@ -23,20 +23,19 @@ type broadcastMessage struct {
 
 type Server struct {
 	clients       map[ClientID]*websocket.Conn
-	port          int
 	broadcastChan chan broadcastMessage
 }
 
-func New(port int) *Server {
-	return &Server{make(map[ClientID]*websocket.Conn), port, make(chan broadcastMessage)}
+func New() *Server {
+	return &Server{make(map[ClientID]*websocket.Conn), make(chan broadcastMessage)}
 }
 
-func (s *Server) Start() error {
+func (s *Server) Start(port int) error {
 
 	http.HandleFunc("/connect", s.connect)
-	log.Println("Starting server on port", s.port)
+	log.Println("Starting httpServer on port", port)
 	go s.broadcastMessages()
-	return http.ListenAndServe(fmt.Sprintf(":%d", s.port), nil)
+	return http.ListenAndServe(fmt.Sprintf(":%d", port), nil)
 
 }
 
@@ -89,7 +88,7 @@ func (s *Server) writeJSON(c *websocket.Conn, data interface{}, cid ClientID) {
 	s.handleWriteError(c.WriteJSON(data), cid)
 }
 
-// unregisterClient removes the client with the given id from the server's map of clients.
+// unregisterClient removes the client with the given id from the httpServer's map of clients.
 func (s *Server) unregisterClient(id ClientID) {
 	go func() {
 		s.broadcastChan <- broadcastMessage{"", fmt.Sprintf("%s disconnected", id)}
