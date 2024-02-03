@@ -31,9 +31,5 @@ func main() {
 	}()
 
 	// Wait for interrupt signal to gracefully shutdown the client
-	select {
-	case <-interrupt:
-		return
-	}
-
+	<-interrupt
 }

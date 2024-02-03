@@ -71,15 +71,12 @@ func (s *Server) connect(w http.ResponseWriter, r *http.Request) {
 
 // broadcastMessages reads messages from the broadcastChan and sends them to all connected clients.
 func (s *Server) broadcastMessages() {
-	for {
-		select {
-		case msg := <-s.broadcastChan:
-			for id, c := range s.clients {
-				if id == msg.Sender {
-					continue
-				}
-				s.writeJSON(c, msg, id)
+	for msg := range s.broadcastChan {
+		for id, c := range s.clients {
+			if id == msg.Sender {
+				continue
 			}
+			s.writeJSON(c, msg, id)
 		}
 	}
 }
