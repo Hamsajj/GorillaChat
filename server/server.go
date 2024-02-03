@@ -3,16 +3,11 @@ package server
 import (
 	"errors"
 	"fmt"
-	"github.com/gorilla/websocket"
 	"log"
 	"net/http"
-)
 
-var upgrader = websocket.Upgrader{
-	CheckOrigin: func(r *http.Request) bool {
-		return true // allow all connections
-	},
-}
+	"github.com/gorilla/websocket"
+)
 
 type ClientID string
 
@@ -24,23 +19,28 @@ type broadcastMessage struct {
 type Server struct {
 	clients       map[ClientID]*websocket.Conn
 	broadcastChan chan broadcastMessage
+	upgrader      websocket.Upgrader
 }
 
 func New() *Server {
-	return &Server{make(map[ClientID]*websocket.Conn), make(chan broadcastMessage)}
+	upgrader := websocket.Upgrader{
+		CheckOrigin: func(r *http.Request) bool {
+			return true // allow all connections
+		},
+	}
+	return &Server{make(map[ClientID]*websocket.Conn), make(chan broadcastMessage), upgrader}
 }
 
 func (s *Server) Start(port int) error {
-
 	http.HandleFunc("/connect", s.connect)
 	log.Println("Starting httpServer on port", port)
 	go s.broadcastMessages()
+	//nolint:gosec // this httpserver is used for socket connection so should not have timeout
 	return http.ListenAndServe(fmt.Sprintf(":%d", port), nil)
-
 }
 
 func (s *Server) connect(w http.ResponseWriter, r *http.Request) {
-	c, err := upgrader.Upgrade(w, r, nil)
+	c, err := s.upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Print("upgrade connect:", err)
 		return
@@ -48,7 +48,7 @@ func (s *Server) connect(w http.ResponseWriter, r *http.Request) {
 	defer c.Close()
 	clientID := ClientID(r.URL.Query().Get("clientID"))
 	if clientID == "" {
-		s.writeJSON(c, ClientIDRequiredError, "")
+		s.writeJSON(c, NewClientIDRequiredError(), "")
 	}
 
 	s.clients[clientID] = c
@@ -64,7 +64,7 @@ func (s *Server) connect(w http.ResponseWriter, r *http.Request) {
 		case websocket.CloseMessage:
 			s.unregisterClient(clientID)
 		default:
-			s.writeJSON(c, UnsupportedMessageType, clientID)
+			s.writeJSON(c, NewUnsupportedMessageType(), clientID)
 		}
 	}
 }

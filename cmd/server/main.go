@@ -1,11 +1,13 @@
 package main
 
 import (
-	"github.com/hamsajj/gorillachat/server"
 	"log"
+
+	"github.com/hamsajj/gorillachat/server"
 )
 
 func main() {
+	const port = 8080
 	s := server.New()
-	log.Fatal(s.Start(8080))
+	log.Fatal(s.Start(port))
 }

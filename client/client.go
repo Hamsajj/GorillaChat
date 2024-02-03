@@ -3,11 +3,12 @@ package client
 import (
 	"context"
 	"fmt"
-	"github.com/google/uuid"
-	"github.com/gorilla/websocket"
 	"log"
 	"net/url"
 	"time"
+
+	"github.com/google/uuid"
+	"github.com/gorilla/websocket"
 )
 
 type Client struct {
@@ -70,7 +71,10 @@ func (c *Client) Start() error {
 func (c *Client) cleanup() error {
 	// Cleanly close the connection by sending a close message and then
 	// waiting (with timeout) for the server to close the connection.
-	err := c.connection.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
+	err := c.connection.WriteMessage(
+		websocket.CloseMessage,
+		websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""),
+	)
 	if err != nil {
 		log.Println("write close:", err)
 		return err
