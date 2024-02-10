@@ -24,7 +24,7 @@ type Server struct {
 
 func New() *Server {
 	upgrader := websocket.Upgrader{
-		CheckOrigin: func(r *http.Request) bool {
+		CheckOrigin: func(_ *http.Request) bool {
 			return true // allow all connections
 		},
 	}
